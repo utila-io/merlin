@@ -1,6 +1,7 @@
 package merlin
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 )
@@ -48,5 +49,20 @@ func TestComplexTranscript(t *testing.T) {
 
 	if chlHex != expectedChlHex {
 		t.Errorf("\nGot : %s\nWant: %s", chlHex, expectedChlHex)
+	}
+}
+
+func TestMarshaling(t *testing.T) {
+	tr := NewTranscript("test protocol")
+	tr.AppendMessage([]byte("step1"), []byte("some data"))
+
+	buff, _ := tr.MarshalBinary()
+	tr2 := &Transcript{}
+	_ = tr2.UnmarshalBinary(buff)
+
+	label := []byte("label")
+
+	if !bytes.Equal(tr.ExtractBytes(label, 32), tr2.ExtractBytes(label, 32)) {
+		t.Errorf("marshaling error")
 	}
 }
